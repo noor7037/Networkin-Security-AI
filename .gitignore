@@ -1,0 +1,7 @@
+node_modules/
+.next/
+.pgdata/
+test-results/
+*.tsbuildinfo
+.DS_Store
+.env*

@@ -1,0 +1,994 @@
+<title>Family App Blueprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Mukta:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column under a full-width navy band; the feature map is a filterable list, the prompt sits last with a copy button. */
+:root {
+  --bg: #F4F7FC;
+  --surface: #FFFFFF;
+  --ink: #0B1B3A;
+  --muted: #475673;
+  --line: #D9E1EF;
+  --band: #002357;
+  --band-ink: #F2F6FF;
+  --band-muted: #B9C7E6;
+  --brand: #1D4ED8;
+  --brand-soft: #E6EEFE;
+  --sun: #FFD23F;
+  --adopt: #0F766E; --adopt-bg: #E3F4F1;
+  --adapt: #1D4ED8; --adapt-bg: #E6EEFE;
+  --later: #9A5B00; --later-bg: #FDF1DC;
+  --reject: #B42318; --reject-bg: #FDE8E6;
+  --founder: #6B2BD9; --founder-bg: #F0E8FE;
+  --code-bg: #0B1733;
+  --code-ink: #E3EAF8;
+  --display: "Baloo 2", "Mukta", system-ui, sans-serif;
+  --body: "Mukta", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #061233; --surface: #0D1C42; --ink: #E8EEFA; --muted: #A6B4D2; --line: #22345E;
+    --band: #0A1A44; --band-ink: #F2F6FF; --band-muted: #AFC0E4;
+    --brand: #8DB4FF; --brand-soft: #16295A; --sun: #FFD23F;
+    --adopt: #5FD3C2; --adopt-bg: #0E3433; --adapt: #8DB4FF; --adapt-bg: #16295A;
+    --later: #F5B653; --later-bg: #3A2A0E; --reject: #FF8A7E; --reject-bg: #3D1714;
+    --founder: #C3A2FF; --founder-bg: #2A1A50; --code-bg: #030A1F; --code-ink: #E3EAF8;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #061233; --surface: #0D1C42; --ink: #E8EEFA; --muted: #A6B4D2; --line: #22345E;
+  --band: #0A1A44; --band-ink: #F2F6FF; --band-muted: #AFC0E4;
+  --brand: #8DB4FF; --brand-soft: #16295A; --sun: #FFD23F;
+  --adopt: #5FD3C2; --adopt-bg: #0E3433; --adapt: #8DB4FF; --adapt-bg: #16295A;
+  --later: #F5B653; --later-bg: #3A2A0E; --reject: #FF8A7E; --reject-bg: #3D1714;
+  --founder: #C3A2FF; --founder-bg: #2A1A50; --code-bg: #030A1F; --code-ink: #E3EAF8;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3, h4 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); font-weight: 800; }
+h4 { font-size: 1.08rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--brand); }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; border-radius: 6px; }
+
+.band { background: var(--band); color: var(--band-ink); }
+.band .wrap { padding-block: 40px 32px; display: grid; gap: 18px; }
+.eyebrow { font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--band-muted); font-weight: 600; }
+.band h1 { font-size: clamp(2.2rem, 1.6rem + 2.6vw, 3.4rem); font-weight: 800; }
+.band h1 span { text-decoration: underline; text-decoration-color: var(--sun); text-decoration-thickness: .1em; text-underline-offset: .14em; }
+.lead { max-width: 64ch; color: var(--band-muted); font-size: 1.08rem; }
+.lead strong { color: var(--band-ink); font-weight: 600; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 6px; }
+.stat { display: flex; align-items: baseline; gap: 8px; }
+.stat b { font-family: var(--display); font-size: 1.9rem; font-variant-numeric: tabular-nums; color: var(--band-ink); }
+.stat span { color: var(--band-muted); font-size: .95rem; }
+.stat.sun b { color: var(--sun); }
+
+section { padding-block: 44px 8px; display: grid; gap: 18px; }
+.sub { color: var(--muted); max-width: 70ch; }
+
+.intent { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.intent li { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 4px; }
+.intent li p { color: var(--muted); font-size: .97rem; }
+
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 720px; font-size: .96rem; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--brand-soft); }
+tr:last-child td { border-bottom: 0; }
+td.n { font-family: var(--mono); font-size: .85rem; color: var(--muted); white-space: nowrap; }
+td.hi { font-weight: 600; }
+td.where { font-family: var(--mono); font-size: .85rem; white-space: nowrap; }
+
+.tabs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.tabs li { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--brand); border-radius: 14px; padding: 14px 16px; display: grid; gap: 6px; align-content: start; }
+.tabs li p { color: var(--muted); font-size: .95rem; }
+
+.filters { display: grid; gap: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chips .lbl { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-right: 4px; }
+.chip { font: inherit; font-size: .92rem; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 14px; min-height: 40px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--surface); }
+.count { color: var(--muted); font-size: .95rem; }
+
+.feats { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.feat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; gap: 8px; }
+.feat-head { display: flex; gap: 10px; align-items: baseline; }
+.fid { font-family: var(--mono); font-size: .82rem; color: var(--muted); min-width: 2.6em; }
+.feat-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ms { font-size: .9rem; color: var(--muted); }
+.ms::before { content: "Milestone: "; }
+.feat-build { color: var(--ink); max-width: 80ch; }
+.feat-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: .88rem; }
+.srcs { display: flex; flex-wrap: wrap; gap: 6px; }
+.src { border: 1px solid var(--line); border-radius: 6px; padding: 1px 8px; color: var(--muted); }
+.money { color: var(--muted); }
+.money::before { content: "Money: "; font-weight: 600; }
+
+.pill { font-size: .8rem; font-weight: 700; letter-spacing: .04em; border-radius: 999px; padding: 2px 10px; display: inline-block; }
+.v-adopt { color: var(--adopt); background: var(--adopt-bg); }
+.v-adapt { color: var(--adapt); background: var(--adapt-bg); }
+.v-later { color: var(--later); background: var(--later-bg); }
+.v-reject { color: var(--reject); background: var(--reject-bg); }
+.flag { font-size: .8rem; font-weight: 700; color: var(--founder); background: var(--founder-bg); border-radius: 999px; padding: 2px 10px; }
+
+.rej { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; color: var(--ink); }
+.rej li::marker { color: var(--reject); }
+
+.miles { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-left: 3px solid var(--line); }
+.miles li { display: grid; grid-template-columns: auto 1fr; gap: 14px; padding: 12px 0 12px 16px; position: relative; }
+.miles li::before { content: ""; position: absolute; left: -8px; top: 20px; width: 13px; height: 13px; border-radius: 50%; background: var(--brand); border: 3px solid var(--bg); }
+.mid { font-family: var(--mono); font-weight: 500; color: var(--brand); padding-top: 2px; }
+.miles p { color: var(--muted); max-width: 72ch; }
+
+.money-list { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; max-width: 80ch; }
+
+.decs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.decs li { background: var(--founder-bg); border-radius: 14px; padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.decs h4 { color: var(--founder); }
+
+.prompt-head { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
+.copy { font: inherit; font-weight: 600; background: var(--brand); color: var(--surface); border: 0; border-radius: 12px; padding: 10px 18px; min-height: 44px; cursor: pointer; }
+.copy[data-done="1"] { background: var(--adopt); }
+pre.prompt { margin: 0; background: var(--code-bg); color: var(--code-ink); font-family: var(--mono); font-size: .82rem; line-height: 1.55; padding: 18px; border-radius: 14px; max-height: 560px; overflow: auto; white-space: pre-wrap; word-break: break-word; }
+footer { padding-block: 40px 56px; color: var(--muted); font-size: .9rem; }
+
+@media (max-width: 520px) {
+  body { font-size: 16px; }
+  .band .wrap { padding-block: 28px 24px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chip, .copy { transition: background-color .15s ease, color .15s ease; }
+}
+</style>
+
+<header class="band">
+  <div class="wrap">
+    <div class="eyebrow">NetCyber AI · Family App · for Noor</div>
+    <h1>Family App <span>Blueprint</span></h1>
+    <p class="lead">Everything already in the plan, your <strong>four mockup boards</strong>, your <strong>10 features</strong> and your <strong>3 recommendations</strong>, each judged, sequenced and priced. The build prompt to copy is at the end. Nothing here comes from the weekend prototype.</p>
+    <div class="stats" aria-label="Summary of verdicts">
+      <div class="stat"><b>38</b><span>features judged</span></div>
+      <div class="stat"><b>24</b><span>adopt</span></div>
+      <div class="stat"><b>7</b><span>adapt</span></div>
+      <div class="stat"><b>6</b><span>later</span></div>
+      <div class="stat"><b>1</b><span>rejected</span></div>
+      <div class="stat sun"><b>6</b><span>need your decision</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section aria-labelledby="h-intent">
+    <h2 id="h-intent">What you asked for</h2>
+    <ul class="intent">
+      <li><h4>Specific to my child</h4><p>Their board, class, chapter, language and past mistakes. Never generic.</p></li>
+      <li><h4>Real, not a demo</h4><p>Real accounts, saved progress, real AI, verified facts with sources.</p></li>
+      <li><h4>Learning that sticks</h4><p>Understand, check, practise, come back until mastered.</p></li>
+      <li><h4>Hindi first-class</h4><p>Every screen in Hindi, English terms beside them, Hinglish as an option.</p></li>
+      <li><h4>Stays until class 12</h4><p>Help, exams, careers, opportunities and a record that survives any school change.</p></li>
+      <li><h4>The parent's calm superpower</h4><p>Know what to do tonight, never miss a form, help in your own language.</p></li>
+      <li><h4>Premium, but kind</h4><p>Beautiful and fast on a budget phone. No fear, no pressure, no ranking of children.</p></li>
+      <li><h4>Depth over count</h4><p>Fewer flows, each one excellent.</p></li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-yours">
+    <h2 id="h-yours">Your features, and where they went</h2>
+    <p class="sub">Every one is in the plan. Most needed changes for the law, for truth or for learning; the reason is beside each.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>#</th><th>Your feature</th><th>In the map</th><th>Verdict</th><th>What changed</th></tr></thead>
+        <tbody><tr><td class="n">1</td><td lang="hi" class="hi">नेशनल कॉम्पिटिटिव और स्कॉलरशिप एग्जाम रनवे</td><td class="where">F1</td><td><span class="pill v-adopt">Adopt</span></td><td>Our own reviewed mock tests; only papers the issuer publishes</td></tr><tr><td class="n">2</td><td lang="hi" class="hi">लाइफटाइम एकेडमिक हेल्थ रिकॉर्ड</td><td class="where">R1, R2, R3</td><td><span class="pill v-adopt">Adopt + Adapt</span></td><td>Health data gets its own consent; &quot;certified&quot; only when verified</td></tr><tr><td class="n">3</td><td lang="hi" class="hi">सोक्रेटिक AI होमवर्क हेल्पर</td><td class="where">L3</td><td><span class="pill v-adopt">Adopt</span></td><td>Hint ladder in Hindi, Hinglish or English</td></tr><tr><td class="n">4</td><td lang="hi" class="hi">&#x27;लर्न-टू-अनलॉक&#x27; स्क्रीन-टाइम कंट्रोल</td><td class="where">R6</td><td><span class="pill v-adapt">Adapt</span></td><td>A web app cannot lock other apps; a native Android app needs the lawyer and Google Play</td></tr><tr><td class="n">5</td><td lang="hi" class="hi">डेली लर्निंग स्ट्रीक और माइक्रो-स्कॉलरशिप्स</td><td class="where">R7</td><td><span class="pill v-adapt">Adapt</span></td><td>Reward mastery, not days; no brand ads to children</td></tr><tr><td class="n">6</td><td lang="hi" class="hi">PTM ऑडियो एनालाइजर और 14-डे होम एक्शन प्लान</td><td class="where">R5</td><td><span class="pill v-adapt">Adapt</span></td><td>Teacher&#x27;s agreement before recording; audio deleted</td></tr><tr><td class="n">7</td><td lang="hi" class="hi">मदर-चाइल्ड स्पोकन इंग्लिश डेली हैबिट</td><td class="where">E3</td><td><span class="pill v-adapt">Adapt</span></td><td>&quot;Try again&quot;, not &quot;wrong&quot;; scores only after accuracy is measured</td></tr><tr><td class="n">8</td><td lang="hi" class="hi">हाइपरलोकल सेकंड-हैंड बुक्स और यूनिफॉर्म एक्सचेंज</td><td class="where">R8</td><td><span class="pill v-later">Later</span></td><td>Parents only, school community first, no exact location</td></tr><tr><td class="n">9</td><td lang="hi" class="hi">एप्टीट्यूड और करियर कंपास</td><td class="where">F3</td><td><span class="pill v-adapt">Adapt</span></td><td>Strengths to explore, never a % match or a verdict</td></tr><tr><td class="n">10</td><td lang="hi" class="hi">बोर्ड एग्जाम पैनिक-बटन</td><td class="where">L6</td><td><span class="pill v-adapt">Adapt</span></td><td>A calm 30-day plan; practice priorities, not predictions</td></tr><tr><td class="n">R1</td><td lang="hi" class="hi">Adaptive Study Plan</td><td class="where">L5</td><td><span class="pill v-adopt">Adopt</span></td><td>Already the heart of the plan</td></tr><tr><td class="n">R2</td><td lang="hi" class="hi">Opportunity Readiness &amp; Verification</td><td class="where">F2</td><td><span class="pill v-adopt">Adopt</span></td><td>Stricter: unverified items are never shown</td></tr><tr><td class="n">R3</td><td lang="hi" class="hi">Low-Data &amp; Offline Learning</td><td class="where">L9</td><td><span class="pill v-adopt">Adopt</span></td><td>Chapter packs with sizes; sync later</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-tabs">
+    <h2 id="h-tabs">The app in five tabs</h2>
+    <p class="sub">Your mockups had a 20-item "More" grid. Grouping it into five tabs keeps each screen to one clear job.</p>
+    <ul class="tabs"><li><h4>Home</h4><p>Greeting, continue, today&#x27;s plan, the ask box (type, photo, speak), tonight&#x27;s talk question, one card for what matters today.</p></li><li><h4>Learn</h4><p>Understand, homework help, practice and mastery, my plan, the board 30-day plan, offline packs.</p></li><li><h4>English</h4><p>The English moment, the 90-day programme, the parent + child duet, the practice partner.</p></li><li><h4>Future</h4><p>Exam runway, scholarships and schemes with readiness, career compass and pathways.</p></li><li><h4>Family</h4><p>Children, the lifetime vault, the admission dossier, my school, the PTM plan, routines and rewards, settings.</p></li></ul>
+  </section>
+
+  <section aria-labelledby="h-map">
+    <h2 id="h-map">Every feature, judged</h2>
+    <div class="filters">
+      <div class="chips" role="group" aria-label="Filter by verdict">
+        <span class="lbl">Verdict</span>
+        <button class="chip" type="button" data-f="verdict" data-v="all" aria-pressed="true" id="fv-all">All</button>
+        <button class="chip" type="button" data-f="verdict" data-v="Adopt" aria-pressed="false" id="fv-adopt">Adopt</button>
+        <button class="chip" type="button" data-f="verdict" data-v="Adapt" aria-pressed="false" id="fv-adapt">Adapt</button>
+        <button class="chip" type="button" data-f="verdict" data-v="Later" aria-pressed="false" id="fv-later">Later</button>
+        <button class="chip" type="button" data-f="verdict" data-v="Reject" aria-pressed="false" id="fv-reject">Reject</button>
+        <button class="chip" type="button" data-f="verdict" data-v="founder" aria-pressed="false" id="fv-founder">Needs your decision</button>
+      </div>
+      <div class="chips" role="group" aria-label="Filter by area">
+        <span class="lbl">Area</span>
+        <button class="chip" type="button" data-f="pillar" data-v="all" aria-pressed="true" id="fp-all">All</button>
+        <button class="chip" type="button" data-f="pillar" data-v="Learn" aria-pressed="false" id="fp-learn">Learn</button>
+        <button class="chip" type="button" data-f="pillar" data-v="English" aria-pressed="false" id="fp-english">English</button>
+        <button class="chip" type="button" data-f="pillar" data-v="Future" aria-pressed="false" id="fp-future">Future</button>
+        <button class="chip" type="button" data-f="pillar" data-v="Family" aria-pressed="false" id="fp-family">Family</button>
+        <button class="chip" type="button" data-f="pillar" data-v="School" aria-pressed="false" id="fp-school">School</button>
+        <button class="chip" type="button" data-f="pillar" data-v="Platform" aria-pressed="false" id="fp-platform">Platform</button>
+      </div>
+      <p class="count" id="count" aria-live="polite"></p>
+    </div>
+    <ul class="feats" id="feats">
+<li class="feat" data-verdict="Adopt" data-pillar="Learn" data-founder="0">
+  <div class="feat-head"><span class="fid">L1</span><h4>Understand (Concept Resolver)</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M1 text, M2 photo</span></div>
+  <p class="feat-build">Topic, search, typed or photo question becomes a streamed answer built from blocks: explanation, worked example, key points, diagram, check, practice, English moment and sources, with follow-ups. English, Hindi or Hinglish.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">1 subject free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Learn" data-founder="0">
+  <div class="feat-head"><span class="fid">L2</span><h4>Visual learning: mind map, diagram, simulation, 3D</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M1 diagram, M2 interactive</span></div>
+  <p class="feat-build">Our own renderers draw from structured data. Interactive maths diagrams and in-house simulations with checked physics. True 3D only on tap, with a 2D fallback.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">1 subject free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Learn" data-founder="0">
+  <div class="feat-head"><span class="fid">L3</span><h4>Socratic homework helper</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M2</span></div>
+  <p class="feat-build">Photo of a question, then a hint ladder: hint 1 of 3, the child&#x27;s attempt with feedback, the next hint, &quot;I&#x27;m stuck&quot;, then step by step. The child writes the final answer. Photos are screened for Aadhaar and faces and deleted after 24 hours.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Your 10</span><span class="src">Mockups</span></span><span class="money">3 photo questions a day free; more in Plus</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Learn" data-founder="0">
+  <div class="feat-head"><span class="fid">L4</span><h4>Checks, practice and the mastery loop</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M1 core, M2 full</span></div>
+  <p class="feat-build">Wrong options are tagged with the misunderstanding they reveal. A wrong answer brings a different explanation and 2 to 3 targeted questions, with revisits after 3 and 10 days. Mastered means correct on two days a week apart.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">1 subject free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Learn" data-founder="0">
+  <div class="feat-head"><span class="fid">L5</span><h4>Adaptive study plan</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M2</span></div>
+  <p class="feat-build">Each day: due revisits, then weak topics, then the next syllabus topic, within 15 to 30 minutes. Reflows from today. Never a wall of missed work.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Recommended</span><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">1 subject free</span></div>
+</li>
+<li class="feat" data-verdict="Adapt" data-pillar="Learn" data-founder="0">
+  <div class="feat-head"><span class="fid">L6</span><h4>Board exam 30-day plan</h4></div>
+  <div class="feat-meta"><span class="pill v-adapt">Adapt</span><span class="ms">M4</span></div>
+  <p class="feat-build">High-priority practice sets from the board&#x27;s official unit weightage, sample papers, marking schemes and published past papers. Reviewed, and labelled &quot;practice priorities, not predictions&quot;. Called a plan, never a panic button.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Your 10</span><span class="src">Mockups</span></span><span class="money">Season pack per subject, or Plus</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Learn" data-founder="0">
+  <div class="feat-head"><span class="fid">L7</span><h4>Practice worksheets</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M2</span></div>
+  <p class="feat-build">Practice sets on screen, plus a printable PDF for families who prefer paper.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Mockups</span></span><span class="money">1 subject free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Learn" data-founder="0">
+  <div class="feat-head"><span class="fid">L8</span><h4>Video inside the answer</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M2</span></div>
+  <p class="feat-build">Found per topic, tap to load, never autoplay. The screen says the provider may show ads and suggestions. Never claims &quot;no distractions&quot;.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">1 subject free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Learn" data-founder="0">
+  <div class="feat-head"><span class="fid">L9</span><h4>Offline and low-data packs</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M2</span></div>
+  <p class="feat-build">Download a chapter pack (reviewed answers, practice sets, notes) with its size shown. Answers sync later. Live AI, voice and video say &quot;needs internet&quot;.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Recommended</span><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">Free subject free; all in Plus</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Learn" data-founder="0">
+  <div class="feat-head"><span class="fid">L10</span><h4>Tonight&#x27;s practice</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M3</span></div>
+  <p class="feat-build">For children linked to a NetCyberAI school: practice on what the class covered today.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span></span><span class="money">1 subject free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Learn" data-founder="0">
+  <div class="feat-head"><span class="fid">L11</span><h4>Exam-day kit and past papers</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M4</span></div>
+  <p class="feat-build">Countdown, paper pattern, checklist and official links. Past papers mapped to syllabus topics.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span></span><span class="money">1 subject free</span></div>
+</li>
+<li class="feat" data-verdict="Later" data-pillar="Learn" data-founder="0">
+  <div class="feat-head"><span class="fid">L12</span><h4>Board answer-writing feedback</h4></div>
+  <div class="feat-meta"><span class="pill v-later">Later</span><span class="ms">After launch</span></div>
+  <p class="feat-build">Typed or photographed answers checked against the board&#x27;s marking-scheme style.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span></span><span class="money">Plus</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="English" data-founder="0">
+  <div class="feat-head"><span class="fid">E1</span><h4>English moment in every answer</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M1</span></div>
+  <p class="feat-build">3 to 5 lines: key words with their Hindi meaning, a model sentence, a pattern to reuse, and read aloud (device speech, labelled).</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">Free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="English" data-founder="0">
+  <div class="feat-head"><span class="fid">E2</span><h4>90-day English programme</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M6</span></div>
+  <p class="feat-build">Four phases, a daily 15-minute lesson, and assessments on days 0, 45 and 90. Progress is measured; fluency is never promised.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">Plus</span></div>
+</li>
+<li class="feat" data-verdict="Adapt" data-pillar="English" data-founder="0">
+  <div class="feat-head"><span class="fid">E3</span><h4>Parent + child English duet</h4></div>
+  <div class="feat-meta"><span class="pill v-adapt">Adapt</span><span class="ms">M6</span></div>
+  <p class="feat-build">5 minutes a day: three everyday sentences, parent and child together. Feedback works at the sound level and says &quot;try again&quot;, never &quot;wrong&quot;. No percentage score until accuracy on Indian accents is measured. Needs its own consent and a provider that allows minors.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Your 10</span><span class="src">Mockups</span></span><span class="money">Plus</span></div>
+</li>
+<li class="feat" data-verdict="Later" data-pillar="English" data-founder="1">
+  <div class="feat-head"><span class="fid">E4</span><h4>AI conversation partner (15 min a day)</h4></div>
+  <div class="feat-meta"><span class="pill v-later">Later</span><span class="flag">Needs your decision</span><span class="ms">Pilot after launch</span></div>
+  <p class="feat-build">Topic roleplays by voice or text, with a daily limit set in Control. An illustrated character, never a photo-real person. A costed pilot first.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">Plus or add-on, on measured cost</span></div>
+</li>
+<li class="feat" data-verdict="Later" data-pillar="English" data-founder="0">
+  <div class="feat-head"><span class="fid">E5</span><h4>Domain English packs</h4></div>
+  <div class="feat-meta"><span class="pill v-later">Later</span><span class="ms">After launch</span></div>
+  <p class="feat-build">Interviews, office, IT, finance and more, for older students and parents.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span></span><span class="money">Plus</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Future" data-founder="0">
+  <div class="feat-head"><span class="fid">F1</span><h4>Competitive exam runway</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M4</span></div>
+  <p class="feat-build">Navodaya, Sainik, Military Schools, NMMS and Olympiads. Verified dates and official links, form-open alerts, and a weekly plan to the exam date. Our own original mock tests, reviewed. Only the past papers the issuer publishes.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Your 10</span><span class="src">Mockups</span></span><span class="money">Information free; mock series in a pack or Plus</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Future" data-founder="0">
+  <div class="feat-head"><span class="fid">F2</span><h4>Scholarships and schemes, with readiness</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M4</span></div>
+  <p class="feat-build">Says &quot;likely eligible: check these conditions&quot; or &quot;not eligible because...&quot;. Document checklist, deadlines, application tracker and reminders, from the National Scholarship Portal and official pages. Unverified items are never shown; no &quot;% match&quot;.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Recommended</span><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">Free</span></div>
+</li>
+<li class="feat" data-verdict="Adapt" data-pillar="Future" data-founder="0">
+  <div class="feat-head"><span class="fid">F3</span><h4>Career compass (classes 8 to 10)</h4></div>
+  <div class="feat-meta"><span class="pill v-adapt">Adapt</span><span class="ms">M4</span></div>
+  <p class="feat-build">Game-based activities on an established interest framework, plus aptitude puzzles on recognised dimensions. Results read as &quot;strengths to explore&quot; with reasons, never a % match or a diagnosis, plus a guide for the parent. Reviewed by a counsellor in the pilot.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Your 10</span><span class="src">Mockups</span></span><span class="money">Summary free; in-depth roadmap Plus</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Future" data-founder="0">
+  <div class="feat-head"><span class="fid">F4</span><h4>Career pathways explorer</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M4</span></div>
+  <p class="feat-build">Every step from a checked pathway graph with its source: a roadmap timeline, skills, exams, and plain uncertainty.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">Free; saved plans Plus</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Family" data-founder="0">
+  <div class="feat-head"><span class="fid">R1</span><h4>Lifetime academic record</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M5</span></div>
+  <p class="feat-build">Report cards, certificates, TC and sports on one timeline that survives any change of school. &quot;Verified by school&quot; only with a verification link; everything else is marked &quot;added by family&quot;.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Your 10</span><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">Free up to a storage limit</span></div>
+</li>
+<li class="feat" data-verdict="Adapt" data-pillar="Family" data-founder="1">
+  <div class="feat-head"><span class="fid">R2</span><h4>Health record (optional)</h4></div>
+  <div class="feat-meta"><span class="pill v-adapt">Adapt</span><span class="flag">Needs your decision</span><span class="ms">M5</span></div>
+  <p class="feat-build">Vaccination and blood group, with their own consent, entered by the family and encrypted. Never sent to AI, never shown to a school unless the family exports it.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Your 10</span></span><span class="money">Free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Family" data-founder="0">
+  <div class="feat-head"><span class="fid">R3</span><h4>Admission dossier, one-tap share</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M5</span></div>
+  <p class="feat-build">Choose records, preview, then share as a PDF and an expiring, view-only, revocable link. Called &quot;certified&quot; only if every item verifies.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Your 10</span><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">One-time or Plus</span></div>
+</li>
+<li class="feat" data-verdict="Later" data-pillar="Family" data-founder="0">
+  <div class="feat-head"><span class="fid">R4</span><h4>DigiLocker / APAAR link</h4></div>
+  <div class="feat-meta"><span class="pill v-later">Later</span><span class="ms">After launch</span></div>
+  <p class="feat-build">Pull official documents only through official partner APIs, if approved. We never handle Aadhaar.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Research</span></span><span class="money">Free</span></div>
+</li>
+<li class="feat" data-verdict="Adapt" data-pillar="Family" data-founder="1">
+  <div class="feat-head"><span class="fid">R5</span><h4>PTM to a 14-day home plan</h4></div>
+  <div class="feat-meta"><span class="pill v-adapt">Adapt</span><span class="flag">Needs your decision</span><span class="ms">M3</span></div>
+  <p class="feat-build">Start from the parent&#x27;s own notes, or the teacher&#x27;s notes for linked schools. Record the meeting only with the teacher&#x27;s agreement; the audio is deleted after transcription. A 15-minute-a-night plan mapped to the child&#x27;s topics, with &quot;request teacher follow-up&quot;.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Your 10</span><span class="src">Mockups</span></span><span class="money">Plus</span></div>
+</li>
+<li class="feat" data-verdict="Adapt" data-pillar="Family" data-founder="1">
+  <div class="feat-head"><span class="fid">R6</span><h4>Learn-to-unlock screen time</h4></div>
+  <div class="feat-meta"><span class="pill v-adapt">Adapt</span><span class="flag">Needs your decision</span><span class="ms">M2; step 2 later</span></div>
+  <p class="feat-build">Step 1: a learning-first routine. The parent sees &quot;today&#x27;s learning done&quot; and grants time in Google Family Link or iOS Screen Time. Step 2: a native Android app that locks apps, only after the lawyer, Google Play and Apple approve.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Your 10</span><span class="src">Mockups</span></span><span class="money">Step 1 free; step 2 add-on</span></div>
+</li>
+<li class="feat" data-verdict="Adapt" data-pillar="Family" data-founder="1">
+  <div class="feat-head"><span class="fid">R7</span><h4>Streaks, rewards, micro-scholarships</h4></div>
+  <div class="feat-meta"><span class="pill v-adapt">Adapt</span><span class="flag">Needs your decision</span><span class="ms">Jar M2; sponsors later</span></div>
+  <p class="feat-build">A forgiving weekly goal, never &quot;you broke your streak&quot;, no leaderboard. Badges for mastered topics, not days. A family reward jar the parent funds. Sponsor-funded rewards only later: no brand messages to children, no child data to sponsors.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Your 10</span><span class="src">Mockups</span></span><span class="money">Free</span></div>
+</li>
+<li class="feat" data-verdict="Later" data-pillar="Family" data-founder="1">
+  <div class="feat-head"><span class="fid">R8</span><h4>Books and uniform exchange</h4></div>
+  <div class="feat-meta"><span class="pill v-later">Later</span><span class="flag">Needs your decision</span><span class="ms">Pilot after launch</span></div>
+  <p class="feat-build">Parents only. The child&#x27;s school community first, then the area, never an exact location. Sell or donate, no in-app payments. Photo screening, report and block, moderation.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Your 10</span><span class="src">Mockups</span></span><span class="money">Free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Family" data-founder="0">
+  <div class="feat-head"><span class="fid">R9</span><h4>Weekly summary and tonight&#x27;s talk question</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M2, Pulse M3</span></div>
+  <p class="feat-build">Three lines a week, and one talk question each evening from what the child learned. Linked schools send their own Daily Pulse.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">Free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Family" data-founder="0">
+  <div class="feat-head"><span class="fid">R10</span><h4>Several children, class-adaptive homes</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M1</span></div>
+  <p class="feat-build">One account, several children, and everything switches with the child. Classes 3 to 5, 6 to 8 and 9 to 12 each get their own style.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">Free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="School" data-founder="0">
+  <div class="feat-head"><span class="fid">S1</span><h4>School Link</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M3</span></div>
+  <p class="feat-build">A one-time code from the school office connects a child. Unlinking ends access at once.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span></span><span class="money">Always free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="School" data-founder="0">
+  <div class="feat-head"><span class="fid">S2</span><h4>School information for linked children</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M3</span></div>
+  <p class="feat-build">Today at school, attendance, report cards, notices and events, fees and receipts in their own section, PTM booking, homework hand-in, study material, help at home, and the Daily Pulse.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">Always free</span></div>
+</li>
+<li class="feat" data-verdict="Later" data-pillar="School" data-founder="0">
+  <div class="feat-head"><span class="fid">S3</span><h4>Exam transparency (rubric, answer sheet)</h4></div>
+  <div class="feat-meta"><span class="pill v-later">Later</span><span class="ms">After launch</span></div>
+  <p class="feat-build">Needs a pilot school and the school-side exams extension first.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">Always free</span></div>
+</li>
+<li class="feat" data-verdict="Reject" data-pillar="School" data-founder="0">
+  <div class="feat-head"><span class="fid">S4</span><h4>Class story</h4></div>
+  <div class="feat-meta"><span class="pill v-reject">Reject</span><span class="ms">—</span></div>
+  <p class="feat-build">Not now: teacher workload and media consent. Revisit with pilot schools.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Mockups</span></span><span class="money">—</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Platform" data-founder="0">
+  <div class="feat-head"><span class="fid">P1</span><h4>Plan and subscription screen</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M7</span></div>
+  <p class="feat-build">One free subject per child, and Family Plus for all children. Prices stay hidden until the pilot shows families return. Cancel in two taps.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span><span class="src">Mockups</span></span><span class="money">—</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Platform" data-founder="0">
+  <div class="feat-head"><span class="fid">P2</span><h4>Settings and privacy</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M1</span></div>
+  <p class="feat-build">Language (English, Hindi, Hinglish), consent per purpose, see and delete answers, delete the account.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span></span><span class="money">Free</span></div>
+</li>
+<li class="feat" data-verdict="Adopt" data-pillar="Platform" data-founder="0">
+  <div class="feat-head"><span class="fid">P3</span><h4>Control: Family and AI</h4></div>
+  <div class="feat-meta"><span class="pill v-adopt">Adopt</span><span class="ms">M1 and onward</span></div>
+  <p class="feat-build">Flags, review queues, AI providers, caps and health. Never shows a child&#x27;s data.</p>
+  <div class="feat-foot"><span class="srcs"><span class="src">Plan</span></span><span class="money">—</span></div>
+</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-rej">
+    <h2 id="h-rej">Taken out of the mockups</h2>
+    <ul class="rej"><li>A leaderboard tab: no ranking of children</li><li>&quot;% match&quot; on careers and scholarships: false precision</li><li>&quot;No distractions&quot; on videos: YouTube always shows suggestions</li><li>A photo-real AI person: an illustrated character instead</li><li>&quot;Predicted&quot; exam questions: practice priorities instead</li><li>Sample facts shown as real (e.g. INSPIRE &quot;for class 9 to 12&quot;: it is for B.Sc. and M.Sc. students)</li><li>A 20-item &quot;More&quot; grid: five tabs with grouped sections instead</li></ul>
+  </section>
+
+  <section aria-labelledby="h-order">
+    <h2 id="h-order">Build order</h2>
+    <p class="sub">Each milestone is its own set of pull requests and passes every quality check before the next starts. After launch, by evidence: the conversation partner, domain English, answer-writing feedback, exam transparency, DigiLocker, the native screen lock, sponsor rewards and the books exchange.</p>
+    <ul class="miles"><li><span class="mid">M1</span><div><h4>The signature slice</h4><p>Parent signs up, adds a child, and the child gets a real answer for their exact chapter, checks it and practises. Progress moves only on checked answers. Maths and Science, classes 6 to 10, English and Hindi.</p></div></li><li><span class="mid">M2</span><div><h4>The daily habit</h4><p>Photo homework help with hints, voice input, the adaptive plan, offline packs, video, simulations, the weekly summary, the talk question, the learning-first routine and the family reward jar.</p></div></li><li><span class="mid">M3</span><div><h4>The school connected</h4><p>School Link and all school information, Tonight&#x27;s practice, and the PTM-to-14-day plan with teacher follow-up. Schools bring families at no cost.</p></div></li><li><span class="mid">M4</span><div><h4>The future</h4><p>Exam runway, scholarships with readiness, career compass and pathways, the board 30-day plan, the exam-day kit and past papers.</p></div></li><li><span class="mid">M5</span><div><h4>The lifetime record</h4><p>The vault, optional health record and the admission dossier with a share link.</p></div></li><li><span class="mid">M6</span><div><h4>English</h4><p>The 90-day programme and the parent + child duet, after the speech accuracy check.</p></div></li><li><span class="mid">M7</span><div><h4>Plus and launch</h4><p>Subscriptions, season packs, school-sponsored Plus, the launch audit, and every legal gate closed.</p></div></li></ul>
+  </section>
+
+  <section aria-labelledby="h-money">
+    <h2 id="h-money">Money</h2>
+    <ul class="money-list">
+      <li><strong>Free and useful on its own:</strong> one subject per child with the full loop, 3 photo questions a day, English moments, scholarships, exam alerts, the career summary, the vault, the weekly summary, and all school information for linked families.</li>
+      <li><strong>Family Plus</strong>, one price for all your children (or paid by the school): every subject, the full homework helper, the English programme and duet, PTM plans, career roadmaps, more vault storage, the dossier and mock tests.</li>
+      <li><strong>Season packs</strong> for families who don't subscribe: an exam runway pack, and a board 30-day pack per subject.</li>
+      <li><strong>Your price points</strong> (₹49 to ₹499, and ₹299 a month for Plus in your mockups) become <strong>test bands</strong> for the pilot. No price appears in the app until we see families come back after 30 days.</li>
+      <li><strong>Never:</strong> ads to children, selling data, fear selling, loans or sales calls. Sponsor rewards and local listings wait for your decision with the lawyer.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="h-dec">
+    <h2 id="h-dec">Decisions only you can make</h2>
+    <ul class="decs"><li><h4>The AI provider and its key</h4><p>Explanations stay switched off until a provider whose terms allow children, with a key and a monthly cap, is chosen.</p></li><li><h4>Reviewers</h4><p>Subjects, mock tests, opportunities, careers and English. Content goes live only as fast as reviewers can check it.</p></li><li><h4>A character or mascot</h4><p>Your mockups show a robot. Yes or no; if yes, one original character with five moods.</p></li><li><h4>Hinglish</h4><p>A third explanation style beside English and Hindi. Recommended: yes.</p></li><li><h4>With the lawyer</h4><p>Health records, recording meetings, the native screen lock, sponsor rewards, local listings on the exchange, and whether the mastery loop counts as monitoring a child.</p></li><li><h4>Prices and payments</h4><p>Your price points become test bands for the pilot. A payment gateway before the first rupee.</p></li></ul>
+  </section>
+
+  <section aria-labelledby="h-prompt">
+    <div class="prompt-head">
+      <h2 id="h-prompt">The build prompt</h2>
+      <button class="copy" type="button" id="copy">Copy the prompt</button>
+    </div>
+    <p class="sub">Paste it into a Claude Code session in netcyberai-core and attach your four mockup images. It is 459 lines and starts with milestone M1.</p>
+    <pre class="prompt" id="prompt" tabindex="0">CONTEXT: From Noor (founder), prepared with the build lead&#x27;s own research and critical review, to the Claude Code
+build lead in netcyberai-core. This programme builds the NetCyber AI Family App as a premium, real product. It covers
+every feature already in the plan, the founder&#x27;s four mockup boards, the founder&#x27;s 10 private features and 3
+recommended additions, each judged and mapped. Work by CLAUDE.md, challenge this brief with evidence where it is
+wrong, and report in plain words, founder actions first.
+
+## 0. Sources of intent, and one hard rule
+
+| Source | What it gives | How to use it |
+|---|---|---|
+| The founder&#x27;s words (§1), `docs/family-app/00`–`09`, Decision Log C230-H to C230-K | Intent, rules, architecture | Binding unless this prompt changes them; log every change |
+| The founder&#x27;s four mockup boards (Parts 1–3 and the overview), attached to this session; the lead commits them to `docs/family-app/mockups/` in the first PR | Look, feel, scope and screen ideas | The reference for the experience. **Not** a source of facts: their sample data is illustrative and some of it is wrong (§7.4) |
+| The founder&#x27;s 10 features and 3 recommendations | Scope the founder wants | Every one is mapped in §4, with its verdict |
+| Evidence (§2) | What works and what the law allows | Cite it in Decision Log rows |
+
+**Hard rule:** the weekend prototype (`~/Downloads/WeekEnd Bilder`) is not a specification, design, data source or code
+source. Do not open it to learn what to build. Its only use is `docs/family-app/prototype-audit/AUDIT.md` §2–§4: a
+list of failures to prevent, and methods to automate.
+
+## 1. The founder&#x27;s intent
+
+&gt; &quot;Your child&#x27;s school syllabus, explained every day in your language, with the best videos, quizzes and every
+&gt; government scheme you qualify for — whether or not your school uses NetCyberAI.&quot;
+
+&gt; &quot;Whichever school the child is in, or if the school changes, this app stays on the phone until class 12.&quot;
+
+A premium, modern, vivid app that keeps families from the first minute.
+
+1. **Specific, never generic:** this child&#x27;s board, class, chapter, language and past mistakes.
+2. **Real, never a demo:**
+   - real accounts, real saved progress, real AI;
+   - verified facts with an official source and a &quot;checked on&quot; date;
+   - nothing simulated, nothing invented.
+3. **Learning that sticks:** understand → check → practise → revisit until mastered. Progress is checked mastery.
+4. **Hindi first-class:**
+   - every screen is complete in Hindi;
+   - English technical terms sit beside the Hindi ones;
+   - Hinglish (Hindi in Roman script) is available as an explanation style.
+5. **The child&#x27;s lifelong companion:**
+   - learning help;
+   - exam runways;
+   - opportunities and careers;
+   - a lifetime record that survives any change of school.
+6. **The parent&#x27;s calm superpower:**
+   - knowing what to do tonight;
+   - never missing a form or deadline;
+   - helping in their own language.
+7. **Premium, but kind:**
+   - beautiful and fast on a budget Android phone on 4G;
+   - no fear, no pressure, no ranking of children;
+   - families stay because the app is useful.
+8. **Depth over count:** fewer flows, each excellent.
+
+## 2. Evidence that shapes the design
+
+- **Tutors, not answer machines:**
+  - Unrestricted GPT-4 practice cut later exam scores by 17%; a hint-based tutor removed most of that harm (Bastani et
+    al., PNAS 2025).
+  - A purpose-built AI tutor beat active learning in less time (Kestin et al., Scientific Reports 2025).
+  - Teacher-guided AI tutoring gave +0.31 SD in six weeks (World Bank, Nigeria 2025).
+  - **So:** hints come first, the child attempts first, and the child does the last step.
+- **Testing and spacing work** (Dunlosky et al., 2013): every response ends in a check, mastery means correct on two
+  days at least 7 days apart, and revisits are scheduled.
+- **Personalised, multi-format content helps retention:** 78% vs 67% on a test 3–5 days later (Google Learn Your Way,
+  2025; small study). **So:** blocks are assembled for this child.
+- **Rewards can backfire:** across 128 studies, tangible rewards for doing a task lowered intrinsic motivation (Deci,
+  Koestner &amp; Ryan, 1999). **So:** rewards follow mastery, not days logged; they are informational and used sparingly.
+- **Children&#x27;s data law:**
+  - DPDP Rules were notified on 13 Nov 2025; verifiable parental consent (Rule 10) applies from 13 May 2027.
+  - Section 9 bars tracking, behavioural monitoring and targeted ads directed at children.
+  - The narrow Fourth Schedule purposes (real-time location for safety, blocking harmful content) do not cover
+    &quot;engagement&quot; or &quot;screen control&quot; by an edtech company. The lawyer decides edge cases (gates L1, L2).
+- **Phones:**
+  - Google Play has restricted Accessibility-API automation since 28 Jan 2026.
+  - iOS parental controls need Apple&#x27;s Family Controls entitlement, granted on review.
+  - A PWA cannot control other apps (`02` §13).
+- **Content rights:**
+  - NCERT books are CC BY-NC-ND: titles and structure only, linked, never copied.
+  - Olympiad organisers sell their own papers: never copy them.
+  - Use only papers the issuer publishes under terms that allow it.
+
+## 3. Product architecture
+
+**Five tabs** (from the mockups, made calmer and grouped). The &quot;More&quot; grid of 20 items is replaced by grouped sections
+inside these tabs.
+
+| Tab | Holds |
+|---|---|
+| **Home** | Greeting and child switcher; &quot;continue&quot;; today&#x27;s plan (15–30 min, adaptive); the ask box (type, photo, speak); tonight&#x27;s talk question; one card of what matters today (a deadline, a school notice) |
+| **Learn** | Understand (the Concept Resolver); Homework help (photo, hint ladder); Practice and mastery; My plan and revision; Board 30-day plan; Offline packs |
+| **English** | The English moment (also inside every response); the 90-day programme; Parent + child duet; the practice partner (pilot) |
+| **Future** | Exam runway (Navodaya, Sainik, Military Schools, Olympiads, NMMS, boards); Scholarships and schemes with readiness; Career compass and pathways |
+| **Family** | Child profiles; Lifetime vault (records, certificates, optional health); Admission dossier; My school (linked children: Today, attendance, reports, notices, fees, PTM, homework, material, Daily Pulse); PTM → 14-day plan; Learning-first routine; Family rewards; Books and uniform exchange (later); Plan and billing; Settings and privacy |
+
+**The daily loop:**
+1. Open the app.
+2. See today&#x27;s plan.
+3. Ask, understand, check and practise.
+4. Due revisits.
+5. The parent sees one calm line.
+
+The parent sees: what was practised, what is shaky, what to say tonight, and what deadline is coming.
+
+**Class-adaptive:**
+- Classes 3–5 get bigger targets, brighter accents and shorter sets.
+- Classes 6–8 get the standard register.
+- Classes 9–12 get a calmer, exam-focused register.
+
+The first build covers classes 6–10; the registers are in the design from day one.
+
+## 4. The feature map: every feature, judged
+
+**Verdicts:**
+- **Adopt:** build as described.
+- **Adapt:** build the useful core, changed for law, truth or learning.
+- **Later:** after launch, by evidence.
+- **Founder:** needs the founder&#x27;s decision.
+- **Reject:** do not build.
+
+**Money:**
+- **Free:** always free.
+- **1-subject:** free for one subject per child; Plus for all.
+- **Plus:** Family Plus.
+- **Pack:** a one-time season pack.
+- **School:** school information, always free to linked families.
+
+### Learn
+
+| # | Feature (source) | Verdict | What we build | Milestone | Money |
+|---|---|---|---|---|---|
+| L1 | Understand / Concept Resolver (plan, mockups) | Adopt | Topic, search, typed or photo question → streamed typed blocks: explanation, worked example, key points, diagram, check, practice, English moment, sources; follow-ups &quot;simpler / another example / explain differently / practise more&quot;; EN, HI, Hinglish | M1 (text), M2 (photo) | 1-subject |
+| L2 | Visual learning: mind map, diagram, interactive diagram (change values, animate), simulation, 3D model (plan, mockups) | Adopt within `09` §3 | Our own renderers from structured data. Interactive maths diagrams. In-house simulations with verified physics. True 3D only on tap, lazy, with a 2D fallback | M1 diagram, M2 interactive and simulations, later 3D | 1-subject |
+| L3 | Socratic homework helper (founder #3, mockups) | Adopt | Photo of a question → the topic is detected → a hint ladder (hint 1 of 3 → the child&#x27;s attempt, with feedback → next hint → &quot;I&#x27;m stuck&quot; → step-by-step), and the child writes the final answer. Never the answer first. Aadhaar and face screen on photos; photos deleted in 24 h | M2 | Free: 3 photo questions a day; Plus: higher fair-use cap (the founder&#x27;s ₹99/month becomes part of Plus) |
+| L4 | Checks, practice, misconception-to-mastery, spaced revision (plan, mockups) | Adopt | Distractors tagged with the misconception they reveal; a wrong answer brings a different explanation plus 2–3 targeted items; revisits at 3 and 10 days; mastered = correct on 2 days ≥ 7 days apart | M1 core, M2 full | 1-subject |
+| L5 | Adaptive study plan (recommendation 1, plan, mockups) | Adopt | Each day: due revisits, then weak topics, then the next syllabus topic (and today&#x27;s school topic for linked children), within a 15–30 min capacity; reflows from today; never a backlog wall | M2 | 1-subject |
+| L6 | Board exam 30-day plan (founder #10, mockups) | Adapt | &quot;Board 30-day plan&quot;: high-priority practice sets drawn from the board&#x27;s official unit weightage, its sample papers and marking schemes, and the past papers the board publishes. Reviewed. Labelled &quot;practice priorities, not predictions&quot;. Explanations from our blocks and the video finder. Called a plan, never a &quot;panic button&quot; | M4 | Pack per subject (the founder&#x27;s ₹99 test band) or Plus |
+| L7 | Practice worksheets with explanations (mockups) | Adopt | Practice sets as screens, plus a printable PDF for families who prefer paper | M2 | 1-subject |
+| L8 | Video in the response (plan, mockups) | Adopt, corrected | Video finder; tap to load; never autoplay. The copy says the provider may show ads and suggestions, **never &quot;no distractions&quot;** (`01` E13) | M2 | 1-subject |
+| L9 | Offline and low-data packs (recommendation 3, plan, mockups) | Adopt | Download a chapter pack (reviewed responses, practice sets, notes) with its size shown; answers sync later; live AI, voice and video say &quot;needs internet&quot;; data-saver loads text first | M2 | Free for the free subject; Plus for all |
+| L10 | Tonight&#x27;s practice (plan, linked) | Adopt | Practice on what the class covered today | M3 | 1-subject |
+| L11 | Exam-day kit and past papers (plan) | Adopt | Countdown, paper pattern, checklist and official links; past papers mapped to topics | M4 | 1-subject |
+| L12 | Board answer-writing feedback (plan) | Later | Answers checked against the marking-scheme style | After launch | Plus |
+
+### English
+
+| # | Feature (source) | Verdict | What we build | Milestone | Money |
+|---|---|---|---|---|---|
+| E1 | English moment, 3–5 lines (plan, mockups) | Adopt | Key words with their Hindi meaning, a model sentence, a pattern, and &quot;read aloud&quot; (device speech, labelled) | M1 | Free |
+| E2 | 90-day English programme (plan, mockups) | Adopt | Phases: Foundation, Confidence, Expand, and Mastery/Workplace for older learners; a daily 15-minute lesson (story, vocabulary, grammar, listen, speak, read, write); assessments on days 0, 45 and 90. **No fluency promise**: measured progress only | M6 | Plus |
+| E3 | Parent + child English duet (founder #7, mockups) | Adapt | 5 minutes a day: 3 everyday sentences, parent and child together, with sound-level feedback. It says &quot;try again&quot; when unsure, never &quot;wrong&quot;. **No percentage score** until accuracy on Indian accents is measured. Consent purpose `voice_practice`; a provider that permits minors and supports Indian English (gate) | M6 | Plus (the founder&#x27;s ₹69/month or ₹499/year test band) |
+| E4 | AI conversation partner, 15 min a day (plan pilot, mockups) | Later (costed pilot) | Topic roleplays by voice or text, with a daily limit set in Control. An illustrated character, never a photo-real human | Pilot after launch | Plus or add-on, on measured cost (`05` §5) |
+| E5 | Domain English packs (plan) | Later | Interviews, office, IT, finance and others | After launch | Plus |
+
+### Future
+
+| # | Feature (source) | Verdict | What we build | Milestone | Money |
+|---|---|---|---|---|---|
+| F1 | Competitive exam runway: Navodaya (class 6, class 9 lateral), Sainik (AISSEE), Military Schools, NMMS, Olympiads (founder #1, mockups) | Adopt | Per exam: verified dates and official links, the pattern and syllabus from the official notice, form-open alerts, a weekly plan to the exam date (the L5 engine), **our own original mock tests** (reviewed, answers re-solved), and only the past papers the issuer publishes | M4 | Information and alerts free; mock series as Pack (the founder&#x27;s ₹199 test band) or Plus (₹499/year test band) |
+| F2 | Scholarships, schemes and readiness (recommendation 2, plan, mockups) | Adopt | Structured eligibility → &quot;likely eligible: check these conditions&quot; or &quot;not eligible because…&quot;. Document checklist, deadlines, an application tracker, reminders. The National Scholarship Portal and official pages are the sources. **Unverified items are never shown**, and there is **no &quot;% match&quot;** | M4 | Free |
+| F3 | Career compass, class 8–10 stream selector (founder #9, mockups) | Adapt | Game-based activities on an established interest framework (RIASEC-type) plus aptitude puzzles on recognised dimensions (as in NCERT and CBSE&#x27;s TAMANNA). Results read as &quot;strengths to explore&quot; with reasons, **never a % match or a diagnosis**, plus a parent conversation guide. Routes come only from the vetted pathway graph. Piloted with a counsellor&#x27;s review before launch | M4 | Summary free; in-depth roadmap Plus (or a one-time report in the founder&#x27;s ₹249 test band) |
+| F4 | Career pathways explorer (plan, mockups) | Adopt | A vetted graph with a source on every step, a roadmap timeline, skills, exams, and plain uncertainty | M4 | Free; saved plans Plus |
+
+### Family and records
+
+| # | Feature (source) | Verdict | What we build | Milestone | Money |
+|---|---|---|---|---|---|
+| R1 | Lifetime academic record (founder #2, plan, mockups) | Adopt | A timeline of report cards, certificates, TC and sports. &quot;Verified by school&quot; **only** with a `/verify` link; everything else is marked &quot;added by family&quot;. Survives any change of school | M5 | Free up to a storage limit (the founder&#x27;s 50 MB); more in Plus |
+| R2 | Health record: vaccination, blood group (founder #2, master plan) | Adapt | Optional; its own consent purpose `health_records`; family-entered; encrypted; never sent to AI; never seen by a school unless the family exports it | M5 | Free |
+| R3 | Admission dossier and one-tap share to a new school (founder #2, plan, mockups) | Adopt | Choose records → preview → a PDF and an expiring, view-only, revocable link. Called &quot;certified&quot; only if every item carries a verification link | M5 | One-time (the founder&#x27;s ₹149 test band) or Plus |
+| R4 | DigiLocker / APAAR link (research) | Later | Pull official documents only through official partner APIs, if approved. We never handle Aadhaar (C232) | After launch | Free |
+| R5 | PTM → 14-day home action plan (founder #6, mockups) | Adapt | Input is the parent&#x27;s own notes (typed or spoken) or, for linked schools, the teacher&#x27;s notes through School Link. Recording the meeting is allowed **only with the teacher&#x27;s agreement**: the audio is transcribed, then deleted. Output is a 14-day plan of 15 minutes a night, mapped to syllabus topics and the mastery loop, with parent guidance. &quot;Request teacher follow-up&quot; goes to the existing follow-up queue | M3 | Plus (the founder&#x27;s ₹79 folds into Plus) |
+| R6 | Learn-to-unlock screen time (founder #4, mockups) | Adapt in two steps, then Founder | **Step 1 (M2):** a learning-first routine. The child agrees a daily goal; the parent sees &quot;today&#x27;s learning done&quot; from our own data only; a guided hand-off to Google Family Link or iOS Screen Time, where the parent grants time. **Step 2 (later):** a native Android companion that locks apps, only after the lawyer rules on DPDP behavioural monitoring, a Play policy review and, for iOS, the Family Controls entitlement | M2; Step 2 Founder | Step 1 free; Step 2 add-on (the founder&#x27;s ₹49 test band) |
+| R7 | Streaks, rewards and micro-scholarships (founder #5, mockups) | Adapt, part Founder | A forgiving weekly goal (for example 5 of 7 days), never &quot;you broke your streak&quot;, **no leaderboard**. Badges for **mastered topics**, not days. A family reward jar: the parent sets a reward, pays it themselves, and the app tracks the goal. Sponsor-funded micro-scholarships come only later, as a CSR-style pool: no brand messages to children, no child data to sponsors, a payouts partner and the lawyer first | Jar M2; sponsor pool Founder | Free |
+| R8 | Books and uniform exchange (founder #8, mockups) | Adapt, Later | Parents only (18+). The child&#x27;s school community first, then the locality. Area only, never an exact location. Sell or donate, with no in-app payments. Photo screening (no children&#x27;s faces), report and block, a moderation queue, a grievance officer. Advertising only by founder exception to `05` rule 4 | Pilot after launch | Free |
+| R9 | Weekly parent summary and tonight&#x27;s talk question (plan, mockups) | Adopt | Three lines a week. A talk question each evening from what the child learned; for linked schools it is the school&#x27;s Daily Pulse | M2 (summary, question), M3 (Pulse) | Free |
+| R10 | Multi-child, child switcher, class-adaptive homes (plan, mockups) | Adopt | One account and several children; everything is keyed to the child | M1 | Free |
+
+### School-connected (linked children only; always free)
+
+| # | Feature (source) | Verdict | What we build | Milestone | Money |
+|---|---|---|---|---|---|
+| S1 | School Link (plan) | Adopt | A school-issued, single-use connect code. Unlinking ends access in the same request | M3 | School |
+| S2 | Today at school, attendance calendar, report cards, notices, events, fees and receipts (their own section), PTM booking, homework hand-in, study material, how to help at home, Daily Pulse with in-app replies (plan, mockups) | Adopt | Per `02` §9, through `SchoolLink` only | M3 | School |
+| S3 | Exam transparency: rubric, answer sheet, re-evaluation (plan, mockups) | Later | Needs a pilot school and the ERP P6 extension first | After launch | School |
+| S4 | Class story in the Pulse (mockups) | Reject for now | Teacher workload and media consent (`02` §13); revisit with pilot schools | — | — |
+
+### Platform
+
+| # | Feature (source) | Verdict | What we build | Milestone | Money |
+|---|---|---|---|---|---|
+| P1 | Plan and subscription screen: one free subject; Family Plus for all children (plan, mockups) | Adopt | Designed now, prices hidden until pilot retention (`05` §4); cancel in two taps | M7 | — |
+| P2 | Settings and privacy | Adopt | Language (EN, HI, Hinglish), consents per purpose, see and delete answers, delete the account | M1 | Free |
+| P3 | Control → Family and Control → AI | Adopt | Flags, review queues, caps, providers and health; never a child&#x27;s data | M1 thin, then each milestone | — |
+
+### Rejected from the mockups
+
+- A leaderboard tab.
+- &quot;% match&quot; figures on careers and scholarships.
+- &quot;No distractions&quot; on videos.
+- A photo-real AI person.
+- &quot;Predicted&quot; exam questions.
+- Sample facts shown as real (§7.4).
+- A 20-item &quot;More&quot; grid.
+
+## 5. Milestones (each its own wave and PR stack, with the §9 gates)
+
+**M1 — the signature slice** (thin FA-1, P-AI and FA-3):
+- A parent signs up with an email code, consents, and adds a child (first name, class 6–10, CBSE, EN, HI or Hinglish,
+  state) in under 60 seconds.
+- The child picks a chapter and topic or types a question and gets a streamed block response for that exact chapter.
+- The child answers a check (hint first) and practises.
+- Progress moves only on checked answers.
+- The parent sees a calm card.
+- Scope: Maths and Science, with the 2026-27 catalog confirmed by a reviewer.
+- Settings, privacy and child switcher (P2, R10) are included.
+- Done when: the founder, on their own phone and in Hindi, runs this story, answers wrongly, gets a different
+  explanation, and sees progress the next day.
+
+**M2 — the daily habit** (FA-4):
+- L1 photo input, L2 interactive and simulations, L3 homework helper;
+- L4 full, L5 adaptive plan;
+- L7, L8, L9;
+- voice input through the `speech_to_text` adapter with consent;
+- R6 step 1, R7 jar, R9 summary and talk question.
+
+**M3 — the school connected** (FA-2 and School Link):
+- S1, S2, L10;
+- R5 PTM → 14-day plan, with teacher follow-up.
+- This is also the zero-cost distribution channel: schools install the app.
+
+**M4 — the future** (FA-5): F1 exam runway, F2 opportunities and readiness, F3 career compass, F4 pathways, L6 board
+30-day plan, L11 exam-day kit and past papers.
+
+**M5 — the lifetime record:** R1, R2, R3.
+
+**M6 — English** (FA-6): E2 programme, E3 duet (after its accuracy gate).
+
+**M7 — Plus and launch** (FA-6, FA-7):
+- Subscriptions (UPI AutoPay), season packs and school-sponsored Plus;
+- the launch audit;
+- gates L1–L7 closed.
+
+**After launch, by evidence:** E4, E5, L12, S3, R4, R6 step 2, the R7 sponsor pool, R8, more boards, states and
+languages.
+
+**Order note:** this moves the learning loop (M1, M2) ahead of school information (`07` had FA-2 first), because it
+is the founder&#x27;s core intent. M3 stays early because schools are the distribution channel. Log the reason in the
+Decision Log.
+
+## 6. Money (rules from `05` stand)
+
+- **Free core that stays useful:**
+  - one subject per child, with the full loop;
+  - 3 photo questions a day;
+  - English moments;
+  - opportunities and readiness;
+  - exam information and alerts;
+  - the career summary;
+  - the vault (up to the storage limit);
+  - the weekly summary;
+  - all school information for linked children.
+- **Family Plus** (one price for all the family&#x27;s children; school-sponsored Plus for a school&#x27;s families):
+  - every subject and higher caps;
+  - the full homework helper;
+  - the 90-day English programme and the duet;
+  - PTM plans;
+  - the in-depth career roadmap;
+  - saved career plans;
+  - vault storage and the dossier;
+  - mock test series.
+- **Season packs** for families who do not subscribe: an exam-runway pack, and a Board 30-day pack per subject.
+- **Add-ons only when they exist:** practice-partner minutes; the native screen routine.
+- **Prices:**
+  - The founder&#x27;s numbers (₹49–₹499 points, and the mockups&#x27; ₹299 a month for Plus) are **test bands for the
+    pilot**, not prices.
+  - No price appears in the product before free-family 30-day retention is measured (`05` §4).
+  - Never one subscription per feature: parents get one clear choice.
+- **No advertising** (`05` rule 4), **no data sales, no fear selling, no loans, no sales calls.** Any exception
+  (R7 sponsors, R8 local listings) is a founder decision after the lawyer.
+
+## 7. Design: the mockups, raised to premium
+
+### 7.1 Keep from the mockups
+
+- Deep navy and electric-blue headers with white cards. This matches the v5 tokens: `sapphire`, `midnight`, `royal`,
+  `electric`, with `cyan`, `grape`, `tangerine` and `sunshine` as accents.
+- Colourful module tiles.
+- A friendly greeting.
+- A clear &quot;Today&#x27;s plan&quot;.
+- The ask box with camera and mic.
+- Progress rings and subject bars.
+- Chips for filters.
+- Official-link buttons.
+- The hint ladder.
+- &quot;Your attempt&quot; feedback.
+- The Hindi meaning under English lines.
+- The four-phase English path.
+- Career roadmap timelines.
+- The vault timeline with &quot;verified by school&quot;.
+- Offline packs with their sizes.
+
+### 7.2 Raise them
+
+- **One clear purpose per screen:**
+  - at most 4 tiles on Home, plus &quot;Today&quot;;
+  - grouped sections instead of a 20-item grid;
+  - one primary action per screen.
+- **Type:**
+  - a modern Latin sans plus Noto Sans Devanagari, self-hosted and subset;
+  - body 16–18 px, Devanagari line height ≥ 1.6;
+  - large display numbers for progress and countdowns;
+  - nothing below 12 px, unlike the mockups&#x27; 10 px labels.
+- **Colour:**
+  - v5 tokens only;
+  - one hue per subject everywhere that subject appears;
+  - gradients only on headers, progress and celebrations, with AA text on them;
+  - status never carried by colour alone.
+- **Depth:**
+  - 16–24 px radii;
+  - layered soft shadows;
+  - press, lift and tilt-on-focus through `transform` only;
+  - parallax on one layer at most.
+- **Motion:**
+  - entrances under 400 ms;
+  - blocks reveal as they stream;
+  - diagrams draw themselves;
+  - a short celebration only for mastery checked twice;
+  - everything becomes a fade under reduced motion, and confetti is off.
+- **Imagery:**
+  - one consistent icon family;
+  - our own commissioned illustrations: never copied, never generic stock, never photo-real AI people.
+  - A character (the mockups show a robot) only if the founder chooses one, with five states: idle, thinking,
+    correct, try again, celebrate.
+- **States:** every async area has a skeleton; designed empty, error, offline, cap-reached and &quot;not switched on yet&quot;
+  states.
+
+### 7.3 Never (in addition to `09` §6)
+
+- Leaderboards.
+- &quot;% match&quot;.
+- Loss-framed streaks.
+- Fear copy.
+- Numbers without a source.
+- English-only lines on Hindi screens.
+- Sideways scrolling.
+
+### 7.4 Mockup sample data that must not reach the product
+
+These are examples of what is wrong in the mockups; verify everything.
+
+- &quot;INSPIRE Scholarship (class 9–12)&quot;: INSPIRE-SHE is for B.Sc. and M.Sc. students.
+- Every exam date and &quot;last date&quot;.
+- &quot;80% match&quot; and &quot;92% match&quot;.
+- &quot;High growth&quot; and &quot;stable career&quot; tags without a source.
+- &quot;No distractions&quot; on videos.
+- &quot;Good pronunciation 85%&quot;.
+- The sample school, child and fee data.
+
+## 8. Non-negotiables
+
+- **Truth:**
+  - no invented number, name, date, claim or source in the product (`check_claims.py`);
+  - a fact without a source and a &quot;checked on&quot; date is not shown;
+  - mock tests and practice items are our own, reviewed, with answers re-solved.
+- **AI:**
+  - the model fills JSON for known blocks; our components render them; never model HTML or code;
+  - numbers recomputed; links from the allowlist;
+  - &quot;AI-made&quot; shown until reviewed;
+  - prompt text versioned in the repository;
+  - hint-first enforced in the prompt and in the UI.
+- **Privacy and safety:**
+  - a child is a first name, class, board, medium and state;
+  - no child identifier reaches a provider (a pre-processor, plus a test on the real outgoing request);
+  - separate consent purposes: `study_core`, `photo_input`, `voice_practice`, `health_records`,
+    `opportunity_matching`, `school_link`;
+  - no trackers, and no third-party images or fonts at runtime;
+  - photos deleted in 24 h, meeting audio deleted after transcription;
+  - the exchange is for adults only;
+  - the parent can see and delete everything.
+- **Language:**
+  - `fam.` keys in `en.ts` and `hi.ts`;
+  - content data carries Hindi fields;
+  - Hinglish is a content style, not a UI language;
+  - `&lt;html lang&gt;` follows the chosen language.
+- **Accessibility and layout:** AA contrast, 44 px targets, labels on every control, no sideways scrolling at 360, 390
+  or 1440 px.
+- **Performance** (`09` §4): LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1, ≤ 200 KB of JavaScript transferred (counting
+  prefetch), no 3D library in the first load.
+- **Security:**
+  - the family session and guard (`03` §3);
+  - forced RLS on `family.*` and `content.*` with no foreign key into `public.*`;
+  - one guarded route per action;
+  - no raw errors on screen.
+
+## 9. Proof gates (automated; a PR that misses one fails)
+
+1. **Typecheck and tests.** `tsc` and the slice&#x27;s tests, including:
+   - RLS with two accounts;
+   - a family session refused by staff APIs, and the reverse;
+   - block safety;
+   - the pre-processor test on the outgoing request;
+   - the minors check;
+   - numeric recomputation;
+   - the cap message;
+   - consent: no processing without the purpose&#x27;s consent.
+2. **Harness pictures** of every family screen at 360, 390 and 1440 px, in English and Hindi, with reduced motion on
+   and off. Compare them against the mockup intent in the PR.
+3. **Scripts that fail the run:**
+   - axe: zero serious or critical issues;
+   - no horizontal overflow;
+   - Hindi completeness;
+   - nothing moves under `reduce`;
+   - Lighthouse mobile budgets per family screen.
+4. **Quality evaluations before a milestone is called done:**
+   - AI responses: 40 topics in each language, on a reviewer rubric (correct, class level, hint-first, apt example,
+     natural Hindi, numbers check);
+   - mock tests: every item reviewed and answer-checked;
+   - the duet: speech feedback measured on Indian-accented samples before any score is shown;
+   - the career compass: a counsellor&#x27;s review of the results on a pilot group.
+   Record each pass rate, and claim nothing beyond it.
+
+## 10. When something is missing
+
+- **No AI provider key:** use a recorded-response adapter in tests only. The app shows &quot;Explanations are not switched
+  on yet&quot;. Never present canned text as AI.
+- **Doubt over a fact or a catalog line:** it is not shown.
+- **A law or policy question** (rewards, the screen lock, health data, recordings, the exchange): build the safe step
+  only, and list the question under founder actions with the gate it waits on.
+- **A conflict with the docs:** state the evidence, propose, and log it.
+
+## 11. Founder decisions this programme needs (ask once, in founder actions)
+
+1. The AI provider (terms that permit children, zero retention where required), its key and monthly caps.
+2. Reviewers for subjects, mock tests, opportunities, careers and English.
+3. A character or mascot: yes or no (the mockups suggest one).
+4. Hinglish as a third explanation style (recommended: yes).
+5. With the lawyer:
+   - health records&#x27; consent wording;
+   - meeting recordings;
+   - the native screen lock (R6 step 2);
+   - sponsor rewards (R7);
+   - local listings on the exchange (R8);
+   - whether the mastery loop is &quot;behavioural monitoring&quot; (L2).
+6. Pricing test bands for the pilot, and the payment gateway (M7).
+
+## 12. Working rules and report
+
+- **CLAUDE.md in full:**
+  - one coherent slice per PR, on base `main`;
+  - reviews scaled to risk (auth, RLS, personal data, money and messaging get `/code-review` medium plus
+    `/security-review`);
+  - no Co-Authored-By and no model name anywhere;
+  - never merge or push to `main`;
+  - no secrets in code, logs, chat or PR text.
+- **Models:** per `08` §1 W, the strongest model for auth, RLS, migrations, personal data and security.
+- **Report:** in the Transparent Output Template, founder actions first, short. Include a phone demo script the founder
+  can follow in Hindi, harness pictures, and every gate&#x27;s real output.
+- **Start with M1.** Stop after M1&#x27;s PR stack and report before starting M2.
+</pre>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Prepared by the build lead from your notes of 17–20 October 2026, your four mockup boards, the plan in docs/family-app, and published research.</div>
+</footer>
+
+<script>
+(function () {
+  var state = { verdict: 'all', pillar: 'all' };
+  var items = Array.prototype.slice.call(document.querySelectorAll('#feats .feat'));
+  var count = document.getElementById('count');
+  function apply() {
+    var shown = 0;
+    items.forEach(function (li) {
+      var okV = state.verdict === 'all' || (state.verdict === 'founder' ? li.dataset.founder === '1' : li.dataset.verdict === state.verdict);
+      var okP = state.pillar === 'all' || li.dataset.pillar === state.pillar;
+      li.hidden = !(okV && okP);
+      if (okV && okP) shown++;
+    });
+    count.textContent = 'Showing ' + shown + ' of ' + items.length;
+  }
+  document.querySelectorAll('.chip').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var f = b.dataset.f;
+      state[f] = b.dataset.v;
+      document.querySelectorAll('.chip[data-f="' + f + '"]').forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+      apply();
+    });
+  });
+  apply();
+
+  var btn = document.getElementById('copy');
+  var pre = document.getElementById('prompt');
+  function selectPre() {
+    var r = document.createRange(); r.selectNodeContents(pre);
+    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+  }
+  btn.addEventListener('click', function () {
+    var text = pre.textContent;
+    var done = function () { btn.textContent = 'Copied'; btn.dataset.done = '1'; setTimeout(function () { btn.textContent = 'Copy the prompt'; btn.dataset.done = '0'; }, 2500); };
+    try {
+      navigator.clipboard.writeText(text).then(done, function () { selectPre(); btn.textContent = 'Selected: press copy'; });
+    } catch (e) { selectPre(); btn.textContent = 'Selected: press copy'; }
+  });
+})();
+</script>
